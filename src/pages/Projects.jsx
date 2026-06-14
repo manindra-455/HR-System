@@ -182,6 +182,7 @@ function ProjectColumn({ title, count, projects, type, isAdminPanelOpen, isUserP
         </div>
         {isAdminPanelOpen && !isUserPanelOpen && (
           <button
+            onClick={() => navigate('/create-project')}
             className="flex h-7 w-7 items-center justify-center rounded-full border bg-white text-text-medium transition-all hover:bg-bg-hover cursor-pointer"
             style={{
               borderColor: colors.borderDefault,
