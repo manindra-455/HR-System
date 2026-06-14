@@ -225,7 +225,7 @@ export default function ProjectsView() {
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
-        const isAdmin = payload.role === 'admin';
+        const isAdmin = payload.role === 'admin' || payload.role === 'sAdmin';
         setIsAdminPanelOpen(isAdmin);
         setIsUserPanelOpen(!isAdmin);
 
