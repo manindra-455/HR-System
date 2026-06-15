@@ -180,7 +180,7 @@ function ProjectColumn({ title, count, projects, type, isAdminPanelOpen, isUserP
             ({count})
           </span>
         </div>
-        {true &&(
+        {isAdminPanelOpen && !isUserPanelOpen && (
           <button
             onClick={() => navigate('/create-project')}
             className="flex h-7 w-7 items-center justify-center rounded-full border bg-white text-text-medium transition-all hover:bg-bg-hover cursor-pointer"
@@ -226,7 +226,8 @@ export default function ProjectsView() {
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
-        const isAdmin = payload.role === 'admin' || payload.role === 'sadmin';
+        const role = payload.role?.toLowerCase() || "";
+        const isAdmin =role.includes("admin");
         setIsAdminPanelOpen(isAdmin);
         setIsUserPanelOpen(!isAdmin);
 
