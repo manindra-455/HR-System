@@ -158,6 +158,8 @@ function ProjectColumn({ title, count, projects, type, isAdminPanelOpen, isUserP
   const statusIndicatorColor =
     type === "pending" ? colors.progressPending : type === "progress" ? colors.progressActive : colors.progressCompleted
 
+console.log("isAdminPanelOpen =", isAdminPanelOpen);
+console.log("isUserPanelOpen =", isUserPanelOpen);
   return (
     <div
       className="flex h-fit max-h-[80vh] flex-col rounded-3xl border p-5 shadow-sm"
@@ -222,6 +224,8 @@ export default function ProjectsView() {
 
   // Decode token role and fetch projects for the company
   useEffect(() => {
+    console.log("Full Payload:", payload);
+    console.log("Role:", payload.role);
     const token = localStorage.getItem('token');
     if (token) {
       try {
