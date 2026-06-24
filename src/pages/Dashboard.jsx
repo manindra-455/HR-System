@@ -6,10 +6,13 @@ import { TrendingUp, Video, Pause, Square, Search, Plus, MonitorX, X } from "luc
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
 import axios from "axios"
 import { BASE_URL } from "../utility/Config"
+import { useRbac } from "../context/RbacContext";
 
 const Dashboard = () => {
   const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1280)
-  const navigate = useNavigate()
+  const { role, hasPermission } = useRbac();
+  const canCreateProject = hasPermission("project.create");
+  const canCreateUser = hasPermission("user.create");
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
   const [isUserPanelOpen, setIsUserPanelOpen] = useState(true);
   const [showAppsPopup, setShowAppsPopup] = useState(false);
@@ -53,26 +56,17 @@ const Dashboard = () => {
 
   // Check user role and fetch dashboard data
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        const isAdmin = payload.role === 'admin';
-        setIsAdminPanelOpen(isAdmin);
-        setIsUserPanelOpen(!isAdmin);
-        
-        // Fetch dashboard data
-        fetchDashboardData(token);
-      } catch (error) {
-        console.error('Error parsing token:', error);
-        setIsAdminPanelOpen(false);
-        setIsUserPanelOpen(true);
-        setLoadingDashboard(false);
-      }
-    } else {
-      setLoadingDashboard(false);
-    }
-  }, []);
+  const token = localStorage.getItem("token");
+
+  setIsAdminPanelOpen(canCreateProject);
+  setIsUserPanelOpen(!canCreateProject);
+
+  if (token) {
+    fetchDashboardData(token);
+  } else {
+    setLoadingDashboard(false);
+  }
+}, [canCreateProject]);
 
   const fetchDashboardData = async (token) => {
     try {
@@ -243,7 +237,7 @@ const Dashboard = () => {
         </div>
         <div className="flex flex-col md:flex-row items-end md:items-center gap-2 md:gap-4">
           <div className="relative">
-            {isAdminPanelOpen && (
+            {hasPermission("user.view") && (
               <>
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
@@ -254,7 +248,7 @@ const Dashboard = () => {
               </>
             )}
           </div>
-          {isAdminPanelOpen && (
+          {canCreateProject && (
             <button 
               onClick={() => navigate('/create-project')}
               className="px-6 py-3 bg-white text-blue-600 border border-blue-600 rounded-full text-sm font-medium cursor-pointer flex items-center gap-2 transition-all duration-200 hover:bg-blue-600 hover:text-white"
@@ -398,7 +392,7 @@ const Dashboard = () => {
         <div className="min-w-[250px] max-w-[350px] w-full flex-1 bg-white p-6 border border-gray-200 shadow-md flex flex-col" style={{ height: '355px', borderRadius: '30px', opacity: 1 }}>
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-gray-900" style={{ fontFamily: 'Inter, sans-serif' }}>Projects</h3>
-            {isAdminPanelOpen && (
+            {canCreateProject && (
               <button onClick={() => navigate('/create-project')} className="border border-blue-500 text-blue-500 px-3 py-1 rounded-full text-xs font-medium hover:bg-blue-50">+ New</button>
             )}
           </div>
@@ -483,7 +477,7 @@ const Dashboard = () => {
         <div className="min-w-[580px] max-w-[650px] w-full flex-1 bg-white p-6 border border-gray-200 shadow-md flex flex-col" style={{ height: '355px', borderRadius: '30px', opacity: 1 }}>
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-gray-900" style={{ fontFamily: 'Inter, sans-serif' }}>Team Collaboration</h3>
-            {isAdminPanelOpen && (
+            {canCreateUser && (
               <button className="border border-blue-500 text-blue-500 px-3 py-1 rounded-full text-xs font-medium hover:bg-blue-50">+ Add Member</button>
             )}
           </div>
