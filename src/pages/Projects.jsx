@@ -5,6 +5,7 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
 import { BASE_URL } from "../utility/Config"
+import { useRbac } from "../context/RbacContext";
 
 // Define colors directly in the component file
 const colors = {
@@ -154,12 +155,10 @@ function ProjectCard({ project, onViewClick }) {
 }
 
 // ProjectColumn Component
-function ProjectColumn({ title, count, projects, type, isAdminPanelOpen, isUserPanelOpen, onProjectClick }) {
+function ProjectColumn({ title, count, projects, type, onCreateProject, canCreateProject, onProjectClick }) {
   const statusIndicatorColor =
     type === "pending" ? colors.progressPending : type === "progress" ? colors.progressActive : colors.progressCompleted
 
-console.log("isAdminPanelOpen =", isAdminPanelOpen);
-console.log("isUserPanelOpen =", isUserPanelOpen);
   return (
     <div
       className="flex h-fit max-h-[80vh] flex-col rounded-3xl border p-5 shadow-sm"
@@ -182,7 +181,7 @@ console.log("isUserPanelOpen =", isUserPanelOpen);
             ({count})
           </span>
         </div>
-        {isAdminPanelOpen && !isUserPanelOpen && (
+        {canCreateProject && (
           <button
             onClick={() => navigate('/create-project')}
             className="flex h-7 w-7 items-center justify-center rounded-full border bg-white text-text-medium transition-all hover:bg-bg-hover cursor-pointer"
@@ -209,12 +208,21 @@ console.log("isUserPanelOpen =", isUserPanelOpen);
 // Main ProjectsView Component
 export default function ProjectsView() {
   const navigate = useNavigate();
+
+  const { hasPermission, role, permissions } = useRbac();
+
+  const canCreateProject = hasPermission("project.create");
+
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
   const [isUserPanelOpen, setIsUserPanelOpen] = useState(true);
   const [pendingProjectsApi, setPendingProjectsApi] = useState([]);
   const [inProgressProjectsApi, setInProgressProjectsApi] = useState([]);
   const [completedProjectsApi, setCompletedProjectsApi] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  console.log("ROLE:", role);
+  console.log("PERMISSIONS:", permissions);
+  console.log("CAN CREATE PROJECT:", canCreateProject);
 
   // Handle project click to navigate to project details
   const handleProjectClick = (projectId) => {
@@ -224,16 +232,12 @@ export default function ProjectsView() {
 
   // Decode token role and fetch projects for the company
   useEffect(() => {
-    console.log("Full Payload:", payload);
-    console.log("Role:", payload.role);
     const token = localStorage.getItem('token');
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
-        const role = payload.role?.toLowerCase() || "";
-        const isAdmin =role.includes("admin");
-        setIsAdminPanelOpen(isAdmin);
-        setIsUserPanelOpen(!isAdmin);
+        setIsAdminPanelOpen(canCreateProject);
+        setIsUserPanelOpen(!canCreateProject);
 
         const companyId = payload.companyCode || payload.id; // company tokens may not have companyCode
         if (companyId) {
