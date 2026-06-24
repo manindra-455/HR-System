@@ -183,7 +183,7 @@ function ProjectColumn({ title, count, projects, type, onCreateProject, canCreat
         </div>
         {canCreateProject && (
           <button
-            onClick={() =>{ console.log("clicked"); onCreateProject();}}
+            onClick={() =>{onCreateProject();}}
             className="flex h-7 w-7 items-center justify-center rounded-full border bg-white text-text-medium transition-all hover:bg-bg-hover cursor-pointer"
             style={{
               borderColor: colors.borderDefault,
@@ -219,10 +219,6 @@ export default function ProjectsView() {
   const [inProgressProjectsApi, setInProgressProjectsApi] = useState([]);
   const [completedProjectsApi, setCompletedProjectsApi] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  console.log("ROLE:", role);
-  console.log("PERMISSIONS:", permissions);
-  console.log("CAN CREATE PROJECT:", canCreateProject);
 
   // Handle project click to navigate to project details
   const handleProjectClick = (projectId) => {

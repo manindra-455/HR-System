@@ -11,6 +11,9 @@ import { useRbac } from "../context/RbacContext";
 const Dashboard = () => {
   const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1280)
   const { role, hasPermission } = useRbac();
+  const navigate = useNavigate();
+  const onCreateProject = () => {navigate("/create-project");};
+  const onAddMember = () => {navigate("/team");};
   const canCreateProject = hasPermission("project.create");
   const canCreateUser = hasPermission("user.create");
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
@@ -250,7 +253,7 @@ const Dashboard = () => {
           </div>
           {canCreateProject && (
             <button 
-              onClick={() => navigate('/create-project')}
+              onClick={onCreateProject}
               className="px-6 py-3 bg-white text-blue-600 border border-blue-600 rounded-full text-sm font-medium cursor-pointer flex items-center gap-2 transition-all duration-200 hover:bg-blue-600 hover:text-white"
             >
               <Plus size={16} />
@@ -393,7 +396,7 @@ const Dashboard = () => {
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-gray-900" style={{ fontFamily: 'Inter, sans-serif' }}>Projects</h3>
             {canCreateProject && (
-              <button onClick={() => navigate('/create-project')} className="border border-blue-500 text-blue-500 px-3 py-1 rounded-full text-xs font-medium hover:bg-blue-50">+ New</button>
+              <button onClick={onCreateProject} className="border border-blue-500 text-blue-500 px-3 py-1 rounded-full text-xs font-medium hover:bg-blue-50">+ New</button>
             )}
           </div>
           <div className="flex-1 overflow-y-auto custom-scrollbar">
@@ -478,7 +481,7 @@ const Dashboard = () => {
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-gray-900" style={{ fontFamily: 'Inter, sans-serif' }}>Team Collaboration</h3>
             {canCreateUser && (
-              <button className="border border-blue-500 text-blue-500 px-3 py-1 rounded-full text-xs font-medium hover:bg-blue-50">+ Add Member</button>
+              <button onClick={onAddMember} className="border border-blue-500 text-blue-500 px-3 py-1 rounded-full text-xs font-medium hover:bg-blue-50">+ Add Member</button>
             )}
           </div>
           <div className="flex-1 overflow-y-auto custom-scrollbar">
